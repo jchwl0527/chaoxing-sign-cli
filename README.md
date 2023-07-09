@@ -2,21 +2,20 @@
 
 ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Licence](https://img.shields.io/github/license/cxOrz/chaoxing-sign-cli?style=for-the-badge)
 
-基于 Nodejs 实现的一个签到命令行工具。
+基于 Nodejs 实现的一个命令行签到工具，在此基础上使用 React.js + Material UI + Koa 扩展成为 Web 项目。
 
-**功能**： 普通签到、拍照签到、手势签到、位置签到、签到码签到、二维码签到（10秒变换不影响），多用户凭据储存，IM 协议自动签到。
-
-**请经常更新你的代码与仓库保持同步，并在代码变更后重新build使之生效**
+**功能**： 普通签到、拍照签到、手势签到、位置签到、签到码签到、二维码签到，多用户凭据储存，IM 协议自动签到。
 
 ## 环境 💻
 
-可在任意运行 [NodeJS](https://nodejs.org/en/) > v16.14 的平台签到，Windows、MacOS、Linux ... 
+可在任意运行 [NodeJS](https://nodejs.org/en/) > v18.14 的平台签到，Windows、MacOS、Linux ... 
 
-安卓手机上可以用 Termux 来运行NodeJS程序，[查看Termux教程](./src/docs/termux.md) 。
+安卓手机上可以用 Termux 来运行NodeJS程序，[查看Termux教程](./apps/server/src/docs/termux.md) 。
 
-苹果手机请查看 [高级](https://github.com/cxOrz/chaoxing-sign-cli#%E9%AB%98%E7%BA%A7-) 部分，通过这种方式来使用，当然这种方式也适用于其他。
+苹果手机请查看 [高级](#高级-) 部分，通过这种方式来使用，当然这种方式也适用于其他。
 
 ## 部署 🛠
 
@@ -30,27 +29,41 @@ git clone https://github.com/cxOrz/chaoxing-sign-cli.git
 
 ```bash
 cd chaoxing-sign-cli
-yarn
+pnpm install
 ```
 
 ## 运行 ⚙
 
 ### 命令解释
 
-- `yarn build`：转译源码，输出到 build 文件夹；必须先转译才能运行程序；
-- `yarn start`：运行程序，若有签到则手动完成，若无则退出程序；
-- `yarn serve`：启动接口服务；
-- `yarn monitor`：监听模式，检测到签到将自动签上，无需人工干预；
+根目录下：
+- `pnpm dev`：运行Web开发服务器、后端接口；
+- `pnpm build`：构建前端页面、转译后端代码；
+- `pnpm start`：运行手动签到；
+- `pnpm serve`：启动后端接口；
+- `pnpm monitor`：启动监听模式，检测到签到将自动签上，无需人工干预；
+
+apps/server 目录下：
+- `pnpm build`：转译代码；
+- `pnpm start`：运行手动签到功能，若有签到则手动完成，若无则退出程序；
+- `pnpm serve`：启动接口；
+- `pnpm monitor`：启动监听模式，检测到签到将自动签上，无需人工干预；
+
+apps/web 目录下：
+- `pnpm dev`：运行 Web 开发服务器；
+- `pnpm build`：构建静态页面；
 
 ### 基本使用方式
 
-更新仓库代码之后，先转译
+进入 `apps/server` 目录下，执行以下步骤：
+
+构建代码
 ```bash
-yarn build
+pnpm build
 ```
-转译完成，后续运行直至下次变更代码，不需要再转译，可以直接运行
+构建完成，后续的运行直至下次变更代码，不需要再构建，可以直接运行
 ```bash
-yarn start
+pnpm start
 ```
 
 ## 使用须知 📄
@@ -59,7 +72,7 @@ yarn start
 
 ### 二维码签到
 
-在运行之前需要做些准备，请找一位挚友，拍一张二维码的照片（无所谓几秒一变），识别二维码，得到一个字符串，复制其中的 `enc` 参数值，例如 `1D0A628CK317F44CCC378M5KD92`，询问时填入。若使用 UI 仓库的项目(查看`高级`)，可以直接选择图片并自动解析得到enc参数。
+在运行之前需要做些准备，请找一位挚友，拍一张二维码的照片，识别二维码，得到一个字符串，复制其中的 `enc` 参数值，例如 `1D0A628CK317F44CCC378M5KD92`，询问时填入。若使用 UI 仓库的项目(查看`高级`)，可以直接选择图片并自动解析得到enc参数。如果遇到10s变换的二维码，参考 [#178](https://github.com/cxOrz/chaoxing-sign-cli/issues/178)
 
 ### 位置签到
 
@@ -75,86 +88,51 @@ yarn start
 
 ### 监听模式
 
-每次需要时启用2-4小时较为合适，请勿挂着不关。
+支持开启QQ机器人、邮件推送、pushplus推送；
+
+**QQ 机器人**：根据 [go-cqhttp](https://docs.go-cqhttp.org/guide/quick_start.html) 文档，配置正向 WebSocket、QQ号、密码，并运行 go-cqhttp 程序，即可运行监听模式并启用该选项。
+
+如需发送二维码让机器人识别并签到，请配置 `env.json` 的 `SecretId` 和 `SecretKey`，将使用腾讯云OCR进行识别和处理。
+
+监听模式每次需要时启用 2 - 4 小时较为合适，最好不要挂着不关。
 
 ## 高级 🎲
 
-以上内容介绍了最基本的用法，接下来介绍一些稍高级一些的使用方法。
+除了简单的 `pnpm start` 来手动签到，也可以部署到服务器使用网页版本，别忘了这也是个 Web 项目。
 
-### 图形化界面
+- 前端界面，查看 [前端](/apps/web) 的详细说明。
+- 后端服务，查看 [服务端](/apps/server) 的详细说明。
 
-基于 React.js + Material UI 开发前端页面，整体设计灵感来自拟态。
+### 一键运行
 
-访问 [这里](https://github.com/cxOrz/chaoxing-sign-ui) 查看图形化页面如何部署，使用图形化页面需要先部署接口才能正常工作。
+方案一：根目录下执行 `pnpm dev` 将运行前后端服务，并在浏览器弹出项目首页，注意这是开发模式！
 
-### 接口服务
+方案二：用提供的 Docker 镜像，运行后可通过 IP 访问。
 
-运行 `npm run serve` 将启动接口服务，接下来描述每个接口的参数以及调用方式：
-
-<details>
-<summary>展开接口详情</summary>
-
-|路径|请求方式|参数|内容类型|返回内容|
-|-|-|-|-|-|
-|/|GET|无|无|\< String \>|
-|/login|POST|phone, password|JSON|\< String \>|
-|/activity|POST|uf, _d, vc3, uid|JSON|JSON|
-|/uvtoken|POST|uf, _d, vc3, uid|JSON|\< String \>|
-|/qrcode|POST|uf, _d, vc3, name, aid, uid, fid, enc|JSON|待填|
-|/location|POST|uf, _d, vc3, name, aid, uid, fid, address, lat, lon|JSON|待填|
-|/general|POST|uf, _d, vc3, name, aid, uid, fid|JSON|待填|
-|/photo|POST|uf, _d, vc3, name, aid, uid, fid, objectId|JSON|待填|
-|/upload|POST|uf, _d, vc3, uid, file, ?_token|multipart/form-data|待填|
-|/qrocr|POST|file|multipart/form-data|\< String \>|
-|/monitor/status|POST|phone|JSON|JSON|
-|/monitor/start|POST|phone, uf, _d, vc3, uid, lv, fid|JSON|JSON|
-|/monitor/stop|POST|phone|JSON|JSON|
-
-</details>
-
-### 最佳实践
-
-在这里介绍部署接口的最佳方式，图形化页面的最佳实践请到它对应的仓库查看。
-
-部署在服务器，步骤如下：
-
-1. 安装 Node 环境，推荐使用 LTS 版本
-2. 克隆代码 `git clone https://github.com/cxOrz/chaoxing-sign-cli.git`
-3. 进入项目目录，安装依赖
-4. 配置项目的 env.json 文件（可选）
-5. 转译源码 `yarn build`（在修改任何文件后，务必转译源码使之生效）
-6. 最后，使用 GNU Screen 或者 PM2 运行接口服务
-
-还有一些事情必需知道：
-
-- 如果要通过UI点击按钮启动监听功能，则要在运行接口服务之前，先运行多次 `yarn monitor` 来配置每一个使用监听的用户的信息（一个用户一份配置，不配置无法使用UI启动监听，其他一切正常），看到 "监听中"，即可终止程序，该用户信息已经写入本地。配置完成后，就可以运行 `yarn serve` 来启动接口了。
-- 如果使用腾讯文字识别来解析二维码，请在 `env.json` 文件中配置 secretId 和 secretKey，然后重新转译代码。
-- 本项目构建的 Docker 镜像，一切均为默认设置，局限性较大。如要求不高，简单签个到，请随意。
-
-<details>
-<summary>使用云函数注意事项</summary>
-
-1. 此项目可以运行在 AWS Lambda 和 腾讯云函数上运行（均不支持监听）。如有需求运行在 Serverless 容器，请修改 `env.json` 中的 `SERVERLESS` 为 `true`，然后重新转译代码。
-2. 如使用腾讯云函数，请仔细按云函数文档操作，对代码稍作调整，安装依赖、转译源码，并配置云函数启动文件 scf_bootstrap 内容为如下命令
-``` bash
-#!/bin/bash
-/var/lang/node16/bin/node build/serve.js
+```bash
+docker pull ghcr.io/cxorz/chaoxing-sign-cli:latest
+docker run -d -p 80:80 -p 5000:5000 chaoxing-sign-cli
 ```
 
-</details>
-
-至此，部署完成，可通过域名或服务器 IP 访问接口的默认路径 `/` ，看到欢迎页面。
+> 出现问题？先仔细阅读相关说明，若仍无法解决请发 issue
 
 ### 展示
 
-演示地址：https://prod.d6afmntd8nh5y.amplifyapp.com （部署在香港，较慢，功能阉割版仅供演示）
+演示地址：https://prod.d6afmntd8nh5y.amplifyapp.com （海外服务器较慢，功能阉割仅供演示UI）
 
 ![](https://cxorz.blob.core.windows.net/static-files/ui-start.png)
-![](https://cxorz.blob.core.windows.net/static-files/ui-qrcode-sign.png)
+![](https://cxorz.blob.core.windows.net/static-files/ui-config.webp)
 
-## 贡献
+## 贡献须知
 
-本项目按照个人意愿进行开发，一些功能以及设计带有个人主观的想法。发起 pr 之前务必先发起issue进行讨论，之后新建一个分支(以提供的功能命名），并在此分支完成你的代码即可提交 pr。请务必保持代码整洁和 commit 规范。
+> 由于作者精力有限，自 2023.6.10 起，本项目将进入维护阶段，欢迎热心同学们贡献代码。
+
+发起 pr 之前务必先发起issue进行讨论，之后新建一个分支(以提供的功能命名），并在此分支完成你的代码即可提交 pr。
+
+必要条件：
+- 运行 `turbo run lint` 无错误出现，可以有警告
+- 测试所有功能全部正常，保证修改不会导致任何原有功能出错
+- 代码设计合理、健壮、简洁
 
 ## 免责声明
 
